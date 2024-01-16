@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"valleyup.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="不冷曲线 步冷曲线的获得为使用K型热电偶测量，实验条件为： &gt;将试样加热至1000℃，采用5、10、20、50和自由冷却的方式冷却至室温 数据处理部分均以20℃&#x2F;s的为例（其实是感觉只有这个的数据处理能看:( 数据处理 对曲线使用了最小二乘法，一阶差分，二阶差分(好像应该写导数)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="冷却曲线处理">
+<meta property="og:url" content="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/index.html">
+<meta property="og:site_name" content="Glenn&#39;s Blog">
+<meta property="og:description" content="不冷曲线 步冷曲线的获得为使用K型热电偶测量，实验条件为： &gt;将试样加热至1000℃，采用5、10、20、50和自由冷却的方式冷却至室温 数据处理部分均以20℃&#x2F;s的为例（其实是感觉只有这个的数据处理能看:( 数据处理 对曲线使用了最小二乘法，一阶差分，二阶差分(好像应该写导数)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/Figure_1.png">
+<meta property="og:image" content="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/Figure_2.png">
+<meta property="og:image" content="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/Figure_3.png">
+<meta property="article:published_time" content="2019-06-02T10:41:37.000Z">
+<meta property="article:modified_time" content="2024-01-16T00:28:22.512Z">
+<meta property="article:author" content="Glenn L">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/Figure_1.png">
+
+
+<link rel="canonical" href="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/","path":"2019/06/02/Cooling-Curve-Processing/","title":"冷却曲线处理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>冷却曲线处理 | Glenn's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Glenn's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">The life style of my own</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E5%86%B7%E6%9B%B2%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">不冷曲线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%8C%E9%98%B6%E5%AF%BC"><span class="nav-number">1.1.1.</span> <span class="nav-text">一二阶导</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%BE%E8%BF%9B"><span class="nav-number">1.1.2.</span> <span class="nav-text">精进？</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Glenn L"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Glenn L</p>
+  <div class="site-description" itemprop="description">为天地立心，为生民立命，为往圣继绝学，为万世开太平</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/valleyUp" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;valleyUp" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lgl9693@gmail.com" title="E-Mail → mailto:lgl9693@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/id/lgl9693/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;id&#x2F;lgl9693&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/lgl9693" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;lgl9693" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>Zhihu</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://valleyup.github.io/2019/06/02/Cooling-Curve-Processing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Glenn L">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glenn's Blog">
+      <meta itemprop="description" content="为天地立心，为生民立命，为往圣继绝学，为万世开太平">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="冷却曲线处理 | Glenn's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          冷却曲线处理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-02 18:41:37" itemprop="dateCreated datePublished" datetime="2019-06-02T18:41:37+08:00">2019-06-02</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="不冷曲线">不冷曲线</h1>
+<p>步冷曲线的获得为使用K型热电偶测量，实验条件为： &gt;将试样加热至1000℃，采用5、10、20、50和自由冷却的方式冷却至室温 数据处理部分均以20℃/s的为例（其实是感觉只有这个的数据处理能看:(</p>
+<h2 id="数据处理">数据处理</h2>
+<p>对曲线使用了最小二乘法，一阶差分，二阶差分(好像应该写导数) <span id="more"></span> ### 最小二乘法</p>
+<p>对于整体曲线使用最小二乘法进行回归分析（好像没什么意义，找不出想要的线性部分）。代码见下，拟合结果见图</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> leastsq</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fun1</span>(<span class="params">x,p</span>):</span><br><span class="line">    k,b = p</span><br><span class="line">    <span class="keyword">return</span> k * x + b</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">residuals</span>(<span class="params">p, y, x</span>): </span><br><span class="line">    <span class="keyword">return</span> y - fun1(x, p)</span><br><span class="line"></span><br><span class="line">data = np.loadtxt(<span class="string">&#x27;CCT20.txt&#x27;</span>)</span><br><span class="line">y = data[:,<span class="number">1</span>]   <span class="comment">#Cgauge</span></span><br><span class="line">x = data[:,<span class="number">6</span>]   <span class="comment">#Temp</span></span><br><span class="line">p0 = [-<span class="number">1</span>,-<span class="number">1</span>]    <span class="comment">#给定初始值</span></span><br><span class="line">plsq = leastsq(residuals, p0, args=(data[:, <span class="number">1</span>], data[:, <span class="number">6</span>]))</span><br><span class="line"><span class="built_in">print</span>(plsq[<span class="number">0</span>], plsq, sep=<span class="string">&#x27;\n&#x27;</span>)  <span class="comment">#最终最小二乘法求得的拟合曲线参数</span></span><br><span class="line"></span><br><span class="line">plt.plot(data[:,<span class="number">6</span>], data[:,<span class="number">1</span>])</span><br><span class="line">plt.plot(data[:,<span class="number">6</span>], fun1(data[:,<span class="number">6</span>], plsq[<span class="number">0</span>]))   <span class="comment">#拟合曲线和原始数据</span></span><br></pre></td></tr></table></figure>
+<figure>
+<img src="Figure_1.png" alt="" /><figcaption>LSQ</figcaption>
+</figure>
+<h3 id="一二阶导">一二阶导</h3>
+<p>对离散数据点求“导”，希望找到导数不变的部分即原始数据中的线性部分，以此来求出整个冷却过程的中相变点。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">data = np.loadtxt(<span class="string">&#x27;CCT20.txt&#x27;</span>)</span><br><span class="line">y = data[:,<span class="number">1</span>]   <span class="comment">#Cgauge</span></span><br><span class="line">x = data[:,<span class="number">6</span>]   <span class="comment">#Temp</span></span><br><span class="line"></span><br><span class="line">dy = np.zeros([<span class="number">4000</span>,<span class="number">2</span>], dtype = <span class="built_in">float</span>)  <span class="comment">#给定初始数组用于储存差分y的数据（如此不负责任的给了4000:)</span></span><br><span class="line"></span><br><span class="line">i = <span class="number">0</span>   <span class="comment">#迭代变量</span></span><br><span class="line">interval = <span class="number">30</span>   <span class="comment">#这个间隔主要是跳过一些数据点，较少一些“噪声”。</span></span><br><span class="line">                <span class="comment">#对于5℃/s的冷速，获得数据点较多，可能由于自身传感器的噪声，原始数据还好，但求一阶导后整个数据波动十分巨大，</span></span><br><span class="line">                <span class="comment"># 甚至远超过自身所包含的信息，根据Google的方法，可以跳过一些数据点（这个多简单），或者滤波（我感觉，但是好麻烦）</span></span><br><span class="line"><span class="keyword">while</span> i &lt; <span class="number">905</span> - interval:   <span class="comment">#905为数据总数量</span></span><br><span class="line">    dy[i,<span class="number">0</span>], dy[i,<span class="number">1</span>] = data[i,<span class="number">6</span>], (data[i+interval,<span class="number">1</span>] - data[i,<span class="number">1</span>])/(data[i+interval,<span class="number">6</span>] - data[i,<span class="number">6</span>]) <span class="comment">#一阶导数</span></span><br><span class="line">    i = i + <span class="number">1</span></span><br><span class="line"></span><br><span class="line">dy2 = np.zeros([<span class="number">4000</span>,<span class="number">2</span>], dtype = <span class="built_in">float</span>) <span class="comment">#同理一阶，这个0数组为了储存一阶导数的导数</span></span><br><span class="line">k = <span class="number">0</span>   <span class="comment">#迭代变量</span></span><br><span class="line">interval2 = <span class="number">10</span>  <span class="comment">#同理</span></span><br><span class="line"><span class="keyword">while</span> k &lt; <span class="number">904</span> - interval:</span><br><span class="line">    dy2[k,<span class="number">0</span>], dy2[k,<span class="number">1</span>] = dy[k,<span class="number">0</span>], ((dy[k+interval2,<span class="number">1</span>] - dy[k,<span class="number">1</span>]) / (dy[k+interval2,<span class="number">0</span>] - dy[k,<span class="number">0</span>]))   <span class="comment">#二阶导数</span></span><br><span class="line">    k += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">fig, ax1 = plt.subplots()</span><br><span class="line">color = <span class="string">&#x27;tab:red&#x27;</span></span><br><span class="line">ax1.set_xlabel(<span class="string">&#x27;Temp&#x27;</span>)</span><br><span class="line">ax1.set_ylabel(<span class="string">&#x27;CGauge&#x27;</span>, color=color)</span><br><span class="line">ax1.plot(data[:,<span class="number">6</span>], data[:,<span class="number">1</span>], color=color, label=<span class="string">&#x27;Temp-CGauge&#x27;</span>)</span><br><span class="line">ax1.tick_params(axis=<span class="string">&#x27;y&#x27;</span>, labelcolor=color)</span><br><span class="line">ax2 = ax1.twinx() <span class="comment">#副y轴，考虑到Temp和导数的数据范围差别还是蛮大的所以又用了一根</span></span><br><span class="line">color = <span class="string">&#x27;tab:blue&#x27;</span></span><br><span class="line">ax2.set_ylabel(<span class="string">&#x27;D&#x27;</span>, color=color)  <span class="comment"># we already handled the x-label with ax1（抄别人代码的注释</span></span><br><span class="line">ax2.plot(dy2[:,<span class="number">0</span>], dy2[:,<span class="number">1</span>], color=color, label=<span class="string">&#x27;2nd D&#x27;</span>)</span><br><span class="line">color = <span class="string">&#x27;tab:green&#x27;</span></span><br><span class="line">ax1.plot(dy[:,<span class="number">0</span>], dy[:,<span class="number">1</span>], color=color, label=<span class="string">&#x27;1st D&#x27;</span>)</span><br><span class="line">ax2.plot([<span class="number">0</span>,<span class="number">1100</span>], [<span class="number">0</span>,<span class="number">0</span>], label=<span class="string">&#x27;Ref line&#x27;</span>)</span><br><span class="line">ax2.tick_params(axis=<span class="string">&#x27;y&#x27;</span>, labelcolor=color)</span><br><span class="line">ax2.set_ylim([-<span class="number">0.00008</span>,<span class="number">0.00008</span>])</span><br><span class="line">ax1.legend(loc=<span class="number">1</span>)</span><br><span class="line">ax2.legend(loc=<span class="number">2</span>)   <span class="comment">#图例的位置，这样两边放好难看，，，，</span></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="Figure_2.png" alt="" /><figcaption>ProcessingFig</figcaption>
+</figure>
+<p>通过图片可以明显看出在相变前，曲线的二阶导在0附近波动（感觉这地方还是处理下会好看点，但这样是不是就算某种程度上修改数据:(。</p>
+<h3 id="精进">精进？</h3>
+<p>又改了下代码，把求导数的部分写成了一个函数，方便对不同组数据的使用。代码见下(另不改y轴范围，不对曲线进行处理，这数据能看？？？做啥研究，上哪门子学回家卖红薯把(╬▔皿▔)凸</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">original_data = [<span class="string">&#x27;CCT5.txt&#x27;</span>, <span class="string">&#x27;CCT10.txt&#x27;</span>, <span class="string">&#x27;CCT20.txt&#x27;</span>, <span class="string">&#x27;CCT50.txt&#x27;</span>, <span class="string">&#x27;CCTfree.txt&#x27;</span>]</span><br><span class="line">CCT5 = np.loadtxt(original_data[<span class="number">0</span>])</span><br><span class="line">CCT10 = np.loadtxt(original_data[<span class="number">1</span>])</span><br><span class="line">CCT20 = np.loadtxt(original_data[<span class="number">2</span>])</span><br><span class="line">CCT50 = np.loadtxt(original_data[<span class="number">3</span>])</span><br><span class="line">CCTfree = np.loadtxt(original_data[<span class="number">4</span>])</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">derivative</span>(<span class="params">x, y, interval</span>):</span><br><span class="line">    length_y = <span class="built_in">len</span>(y)</span><br><span class="line">    dy = np.zeros([length_y, <span class="number">2</span>], dtype = <span class="built_in">float</span>)</span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    i_interval = interval</span><br><span class="line">    <span class="keyword">while</span> i &lt; length_y - i_interval:   </span><br><span class="line">        dy[i,<span class="number">0</span>], dy[i,<span class="number">1</span>] = x[i], (y[i+i_interval] - y[i])/(x[i+i_interval] - x[i])</span><br><span class="line">        i = i + <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> dy</span><br><span class="line">dy_20 = derivative(CCT20[:,<span class="number">6</span>], CCT20[:,<span class="number">1</span>], <span class="number">20</span>)</span><br><span class="line">ddy_20 = derivative(dy_20[:,<span class="number">0</span>], dy_20[:,<span class="number">1</span>], <span class="number">20</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">plt.plot(ddy_20[:,<span class="number">0</span>], ddy_20[:,<span class="number">1</span>])</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="Figure_3.png" alt="" /><figcaption>Fig 3</figcaption>
+</figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/05/18/2019-5-19/" rel="prev" title="读书摘录(May 19th, 2019)">
+                  <i class="fa fa-angle-left"></i> 读书摘录(May 19th, 2019)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/06/09/htuwin/" rel="next" title="如何“优雅”地使用Windowns">
+                  如何“优雅”地使用Windowns <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Glenn L</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"ams","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

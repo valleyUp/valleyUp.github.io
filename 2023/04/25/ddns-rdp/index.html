@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"valleyup.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言 最近，在单位老是需要用到家里面的电脑的资料，拿U盘拷来栲去，感觉又显得特别麻瓜。再加上有时候想摸鱼，用电脑冲冲浪。于是有了远程电脑的需要，最开始是用了todesk的免费版，总体上需求是能满足的，但是免费版的性能有点捉襟见肘，而且由于家里面电脑是4K的分辨率，单位的是2K和1080P，不能自动缩放，使用感观也是一言难尽。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动态DNS实现远程桌面">
+<meta property="og:url" content="https://valleyup.github.io/2023/04/25/ddns-rdp/index.html">
+<meta property="og:site_name" content="Glenn&#39;s Blog">
+<meta property="og:description" content="前言 最近，在单位老是需要用到家里面的电脑的资料，拿U盘拷来栲去，感觉又显得特别麻瓜。再加上有时候想摸鱼，用电脑冲冲浪。于是有了远程电脑的需要，最开始是用了todesk的免费版，总体上需求是能满足的，但是免费版的性能有点捉襟见肘，而且由于家里面电脑是4K的分辨率，单位的是2K和1080P，不能自动缩放，使用感观也是一言难尽。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://valleyup.github.io/2023/04/25/ddns-rdp/qiaojie.png">
+<meta property="og:image" content="https://valleyup.github.io/2023/04/25/ddns-rdp/qiaojie2.png">
+<meta property="og:image" content="https://valleyup.github.io/2023/04/25/ddns-rdp/zhuanfa.png">
+<meta property="og:image" content="https://valleyup.github.io/2023/04/25/ddns-rdp/ddns.png">
+<meta property="article:published_time" content="2023-04-25T13:30:35.000Z">
+<meta property="article:modified_time" content="2024-01-16T00:28:22.528Z">
+<meta property="article:author" content="Glenn L">
+<meta property="article:tag" content="SETUP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://valleyup.github.io/2023/04/25/ddns-rdp/qiaojie.png">
+
+
+<link rel="canonical" href="https://valleyup.github.io/2023/04/25/ddns-rdp/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://valleyup.github.io/2023/04/25/ddns-rdp/","path":"2023/04/25/ddns-rdp/","title":"动态DNS实现远程桌面"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>动态DNS实现远程桌面 | Glenn's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Glenn's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">The life style of my own</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%89%E7%8C%AB%E8%B7%AF%E7%94%B1%E6%94%B9%E6%A1%A5%E6%8E%A5"><span class="nav-number">1.1.</span> <span class="nav-text">光猫路由改桥接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E5%99%A8%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.</span> <span class="nav-text">路由器配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%BD%E5%B8%A6%E7%99%BB%E5%BD%95"><span class="nav-number">1.2.1.</span> <span class="nav-text">宽带登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91"><span class="nav-number">1.2.2.</span> <span class="nav-text">端口转发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81dns"><span class="nav-number">1.2.3.</span> <span class="nav-text">动态DNS</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">2.</span> <span class="nav-text">结语</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Glenn L"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Glenn L</p>
+  <div class="site-description" itemprop="description">为天地立心，为生民立命，为往圣继绝学，为万世开太平</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/valleyUp" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;valleyUp" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lgl9693@gmail.com" title="E-Mail → mailto:lgl9693@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/id/lgl9693/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;id&#x2F;lgl9693&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/lgl9693" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;lgl9693" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>Zhihu</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://valleyup.github.io/2023/04/25/ddns-rdp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Glenn L">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glenn's Blog">
+      <meta itemprop="description" content="为天地立心，为生民立命，为往圣继绝学，为万世开太平">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="动态DNS实现远程桌面 | Glenn's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          动态DNS实现远程桌面
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-04-25 21:30:35" itemprop="dateCreated datePublished" datetime="2023-04-25T21:30:35+08:00">2023-04-25</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言">前言</h1>
+<p>最近，在单位老是需要用到家里面的电脑的资料，拿U盘拷来栲去，感觉又显得特别麻瓜。再加上有时候想摸鱼，用电脑冲冲浪。于是有了远程电脑的需要，最开始是用了todesk的免费版，总体上需求是能满足的，但是免费版的性能有点捉襟见肘，而且由于家里面电脑是4K的分辨率，单位的是2K和1080P，不能自动缩放，使用感观也是一言难尽。</p>
+<span id="more"></span>
+<p>因此有了打洞，使用原生远程桌面的想法。最开始是打算的是国内买台VPS，通过frp或者nps来实现穿透内网。但是打电话给小区宽带发现，可以给光猫改桥接，可以有IPV6的公网地址，IPV4的还是内网。而且现在手机移动网也是有IPV6的，刚好可以满我的需求。</p>
+<p>需要的条件有：</p>
+<ul>
+<li>公网IP（这里IPV6也可以，而且湖南联通好像IPV4完全不给个人了）</li>
+<li>域名</li>
+<li>OpenWRT</li>
+</ul>
+<h2 id="光猫路由改桥接">光猫路由改桥接</h2>
+<p>首先是需要获取光猫的超级密码（我也是通过网友分享，湖南长沙联通的网友可以试试这个CUAdmin#HGU），登录<a target="_blank" rel="noopener" href="http://192.168.1.1/cu.html">光猫后台</a>，输入超级密码。然后就是路由改桥接的操作，这里由于我没有用IPTV，不知道是不是因为这个原因，我的宽带并不需要VLAN，这里我是直接取消掉使能的框，然后新建了一个连接。新建的连接就非常简单了，直接吧连接模式选成桥接就可以了，然后保存一下就行了。</p>
+<figure>
+<img src="qiaojie.png" alt="" /><figcaption>光猫原有路由连接取消使能</figcaption>
+</figure>
+<figure>
+<img src="qiaojie2.png" alt="" /><figcaption>光猫新建连接信息</figcaption>
+</figure>
+<p>对这里基本上就改好了，真的很简单。然后是切换到路由器中，设置宽带登录，动态DNS的配置。值得注意的是，我的光猫在切换桥接之后，是没办法再通过http://192.168.1.1/cu.html 来访问，可能是因为光猫不再主动分配IP，我的解决办法是，手动切换路由器的WAN口协议为静态IP，改成192.168.1.3，网关改成192.168.1.1，这样就可以。</p>
+<h2 id="路由器配置">路由器配置</h2>
+<p>我的路由器是极路由B70，然后我刷的是OpenWRT，固件采用Github Actions编译的，特别的是对于动态DNS是采用了一个<a target="_blank" rel="noopener" href="https://github.com/gdy666/lucky">新插件Lucky</a>，在LEDE的版本中可以直接在luci app中启用。这里之所以不用自带的那个DDNS-GO，是因为只有IPV6的公网地址，OpenWRT自带防火墙的端口转发，并不能实现IPV6端口转发到IPV4端口。Lucky的话，功能更丰富，可以实现SSL证书申请、端口转发、Web服务等。</p>
+<h3 id="宽带登录">宽带登录</h3>
+<p>把光猫出来的网线插在路由器WAN口，然后登录到路由器管理界面，把WAN口切换到PPPoE协议，输入宽带账号（这个账号可以过联通网上营业厅获取，但是现在密码没办法改了，打客服也说查不到，不过我试了下后6位是可以的），保存就可以了。然后就可以看下路由器的WAN口状态，确认下有没有公网IP（令我惊讶的是，电信的似乎可以给公网IPV4地址，真是羡慕）。如果没有似乎是没必要往下看了。</p>
+<h3 id="端口转发">端口转发</h3>
+<p>如果这里有IPV4的话，直接打开端口转发就可以了，在路由器上随机设置一个端口，然后将其流量转发到被控制电脑的3389端口（这里应该打开UDP协议会好一点）。如果只有IPV6协议的话，那似乎就要麻烦一点，由于使用的OpenWRT，防火墙自带的端口转发不支持IPV6到IPV4的转发，必须使用socat或这是上面提到的Lucky。这里Lucky的操作更简单点，不用去处理防火墙规则，直接打开端口转发，按照下图设置规则就可以了。（NOTE：这里感觉应该设置成白名单更好过滤掉本地以外的ip地址防止被黑，但是我搜了好久也没找到湖南省ipv6分配的规则😂）至此我们已经可以实现利用IP地址来远程连接电脑了，这个对IPV4可能还比较可能，对于IPV6那一大串，真的是搞不定。</p>
+<figure>
+<img src="zhuanfa.png" alt="" /><figcaption>Lucky端口转发规则设置</figcaption>
+</figure>
+<h3 id="动态dns">动态DNS</h3>
+<p>为了避免记忆ip地址，和应对没过一段时间，宽带公网IP的变化（当然如果你是尊贵的静态IP用户，当我没说😭），可以买一个便宜域名，把IP绑定到域名上（原理上应该是在路由器运行一段代码，定时的检测WAN口IP，如果改变就以密钥访问域名托管，更改域名的解析IP地址）。方便的是Lucky也带了动态DNS功能，直接打开DDNS功能，选择新建一个DDNS任务，具体设置可以参考下图。</p>
+<figure>
+<img src="ddns.png" alt="" /><figcaption>Lucky动态DNS规则设置</figcaption>
+</figure>
+<h1 id="结语">结语</h1>
+<p>至此整个配置就算完成了，可以拿手机流量测试下。在控制电脑打开远程桌面连接，地址就输入你绑定的域名（或者是IP地址，例如：test.example.xyz:46885），点击连接就可以了。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SETUP/" rel="tag"># SETUP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/04/19/python-inherit-experiment/" rel="prev" title="Python中私有方法和受保护方法的继承">
+                  <i class="fa fa-angle-left"></i> Python中私有方法和受保护方法的继承
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Glenn L</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"ams","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

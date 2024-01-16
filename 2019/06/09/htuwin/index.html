@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"valleyup.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="主要备份下自己对于win10系统的设置，PowerShell的美化，wsl的使用：写博客和抄代码。 PowerShell的美化 主要用到的有，各个模块主要由PS Gallery进行：  posh-git oh-my-posh PSReadLine PS Color (其实好像Dir Color可以直接用linux上的配置文件，但是好像一直没效果😂) PowerLine Font：Sarasa G">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何“优雅”地使用Windowns">
+<meta property="og:url" content="https://valleyup.github.io/2019/06/09/htuwin/index.html">
+<meta property="og:site_name" content="Glenn&#39;s Blog">
+<meta property="og:description" content="主要备份下自己对于win10系统的设置，PowerShell的美化，wsl的使用：写博客和抄代码。 PowerShell的美化 主要用到的有，各个模块主要由PS Gallery进行：  posh-git oh-my-posh PSReadLine PS Color (其实好像Dir Color可以直接用linux上的配置文件，但是好像一直没效果😂) PowerLine Font：Sarasa G">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://valleyup.github.io/2019/06/09/htuwin/Fig1.png">
+<meta property="og:image" content="https://valleyup.github.io/2019/06/09/htuwin/Fig2.png">
+<meta property="article:published_time" content="2019-06-09T08:43:13.000Z">
+<meta property="article:modified_time" content="2024-01-16T00:28:22.532Z">
+<meta property="article:author" content="Glenn L">
+<meta property="article:tag" content="Backup">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://valleyup.github.io/2019/06/09/htuwin/Fig1.png">
+
+
+<link rel="canonical" href="https://valleyup.github.io/2019/06/09/htuwin/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://valleyup.github.io/2019/06/09/htuwin/","path":"2019/06/09/htuwin/","title":"如何“优雅”地使用Windowns"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>如何“优雅”地使用Windowns | Glenn's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Glenn's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">The life style of my own</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#powershell%E7%9A%84%E7%BE%8E%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">PowerShell的美化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wsl%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">WSL的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wsl%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">2.1.</span> <span class="nav-text">WSL的安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ubuntu-%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text">Ubuntu 配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zsh-%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.</span> <span class="nav-text">ZSH 配置</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Glenn L"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Glenn L</p>
+  <div class="site-description" itemprop="description">为天地立心，为生民立命，为往圣继绝学，为万世开太平</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/valleyUp" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;valleyUp" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:lgl9693@gmail.com" title="E-Mail → mailto:lgl9693@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/id/lgl9693/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;id&#x2F;lgl9693&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/lgl9693" title="Zhihu → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;lgl9693" rel="noopener me" target="_blank"><i class="fab fa-zhihu fa-fw"></i>Zhihu</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://valleyup.github.io/2019/06/09/htuwin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Glenn L">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glenn's Blog">
+      <meta itemprop="description" content="为天地立心，为生民立命，为往圣继绝学，为万世开太平">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="如何“优雅”地使用Windowns | Glenn's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何“优雅”地使用Windowns
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-09 16:43:13" itemprop="dateCreated datePublished" datetime="2019-06-09T16:43:13+08:00">2019-06-09</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>主要备份下自己对于win10系统的设置，PowerShell的美化，wsl的使用：写博客和抄代码。</p>
+<h2 id="powershell的美化">PowerShell的美化</h2>
+<p>主要用到的有，各个模块主要由PS Gallery进行：</p>
+<ul>
+<li>posh-git</li>
+<li>oh-my-posh</li>
+<li>PSReadLine</li>
+<li>PS Color (其实好像Dir Color可以直接用linux上的配置文件，但是好像一直没效果😂)</li>
+<li>PowerLine Font：Sarasa Gothic(or: dejavu sans mono nerd font)</li>
+<li>ColorTool (<a target="_blank" rel="noopener" href="https://github.com/microsoft/terminal/releases">release</a> 界面，添加到环境变量)</li>
+</ul>
+<span id="more"></span>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(<span class="built_in">new-object</span> Net.WebClient).DownloadString(<span class="string">&quot;http://psget.net/GetPsGet.ps1&quot;</span>) | <span class="built_in">iex</span> <span class="comment">#PS Get</span></span><br><span class="line"><span class="built_in">Get-ExecutionPolicy</span> <span class="literal">-List</span></span><br><span class="line"><span class="built_in">Set-ExecutionPolicy</span> RemoteSigned <span class="literal">-Scope</span> CurrentUser</span><br><span class="line"><span class="built_in">Get-ExecutionPolicy</span> <span class="literal">-Scope</span> CurrentUser</span><br><span class="line"><span class="built_in">Install-Module</span> posh<span class="literal">-git</span> <span class="literal">-Scope</span> CurrentUser</span><br><span class="line"><span class="built_in">Install-Module</span> <span class="built_in">oh</span><span class="literal">-my-posh</span> <span class="literal">-Scope</span> CurrentUser</span><br><span class="line"><span class="built_in">Install-Module</span> <span class="literal">-Name</span> PSReadLine <span class="literal">-AllowPrerelease</span> <span class="literal">-Scope</span> CurrentUser</span><br><span class="line"><span class="built_in">Install-Module</span> <span class="literal">-Name</span> PSColors <span class="literal">-Scope</span> CurrentUser</span><br></pre></td></tr></table></figure>
+<p>首先在Power Shell的快捷方式目标后加上运行参数 <code>-NoLogo</code>来禁止每次打开时的版权声明，然后到 <code>C:\Users\\*\Documents\WindowsPowerShell</code> 下修改配置文件导入模块声明主题。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Import-Module</span> PSColor</span><br><span class="line"><span class="built_in">Import-Module</span> posh<span class="literal">-git</span></span><br><span class="line"><span class="built_in">Import-Module</span> <span class="built_in">oh</span><span class="literal">-my-posh</span></span><br><span class="line"><span class="built_in">Set-Theme</span> Honukai</span><br></pre></td></tr></table></figure>
+<p>最终配置好截图如下 <img src="Fig1.png" alt="Fig1" /></p>
+<h2 id="wsl的配置">WSL的配置</h2>
+<h3 id="wsl的安装">WSL的安装</h3>
+<p>好像因为用的是教育版Win10，没有Windows商店，没办法直接点点/(ㄒoㄒ)/~~，只能用手动了。首先下载Ubuntu 18.04的<a target="_blank" rel="noopener" href="https://aka.ms/wsl-ubuntu-1804">映像</a>。然后在Downloads文件夹执行以下命令，然后就可以在开始菜单找到Ubuntu App了，点击进行部署。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Add-AppxPackage</span> CanonicalGroupLimited.Ubuntu18.<span class="number">04</span>onWindows_1804.<span class="number">2018.817</span>.<span class="number">0</span>_x64__79rhkp1fndgsc.Appx</span><br></pre></td></tr></table></figure>
+<h3 id="ubuntu-配置">Ubuntu 配置</h3>
+<p>没什么好备份的，就是设置账号密码，配置hexo和anaconda环境</p>
+<h3 id="zsh-配置">ZSH 配置</h3>
+<p>用上就会爱上o(<em>////▽////</em>)。主要有：</p>
+<ul>
+<li>ZSH</li>
+<li>Oh-My-ZSH
+<ul>
+<li>zsh-syntax-highlighting</li>
+<li>zsh-autosuggestions</li>
+<li>cp</li>
+<li>extract</li>
+<li>web-search</li>
+<li>colored-man-pages</li>
+<li>autojump</li>
+</ul></li>
+<li>tldr</li>
+</ul>
+<p>.zshrc文件内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">export ZSH=&quot;/home/gll/.oh-my-zsh&quot;</span><br><span class="line">ZSH_THEME=&quot;ys&quot;</span><br><span class="line"></span><br><span class="line">plugins=(git</span><br><span class="line">         zsh-syntax-highlighting</span><br><span class="line">         zsh-autosuggestions</span><br><span class="line">         cp </span><br><span class="line">         extract</span><br><span class="line">         web-search</span><br><span class="line">         colored-man-pages</span><br><span class="line">         autojump</span><br><span class="line">        )</span><br><span class="line">. /usr/share/autojump/autojump.sh</span><br><span class="line"></span><br><span class="line">source $ZSH/oh-my-zsh.sh</span><br><span class="line"></span><br><span class="line">alias zshconfig=&quot;mate ~/.zshrc&quot;</span><br><span class="line">alias ohmyzsh=&quot;mate ~/.oh-my-zsh&quot;</span><br><span class="line">alias chrome=&quot;/mnt/c/Program\ Files\ \(x86\)/Google/Chrome/Application/chrome.exe &amp;&quot;</span><br><span class="line">alias endnote=&quot;/mnt/c/Program\ Files\ \(x86\)/EndNote X9/EndNote.exe &amp;&quot;</span><br><span class="line">alias netease=&quot;/mnt/c/Program\ Files\ \(x86\)/Netease/CloudMusic/cloudmusic.exe &amp;&quot;</span><br><span class="line">alias steam=&quot;/mnt/c/Program\ Files\ \(x86\)/Steam/Steam.exe &amp;&quot;</span><br><span class="line">alias wechat=&quot;/mnt/c/Program\ Files\ \(x86\)/Tencent/WeChat/WeChat.exe &amp;&quot;</span><br><span class="line">alias uplay=&quot;/mnt/c/Program\ Files\ \(x86\)/Ubisoft/Ubisoft\ Game\ Launcher/Uplay.exe &amp;&quot;</span><br><span class="line">alias vsc=&quot;/mnt/c/Program\ Files/Microsoft\ VS\ Code/Code.exe&quot;</span><br><span class="line">alias origin=&quot;/mnt/c/Program\ Files/OriginLab/Origin2018/Origin95_64.exe &amp;&quot;</span><br><span class="line">alias tim=&quot;/mnt/c/Program\ Files\ \(x86\)/Tencent/TIM/Bin/QQScLauncher.exe &amp;&quot;</span><br><span class="line">alias dls=&quot;/mnt/c/Users/lgl96/Downloads&quot;</span><br><span class="line">alias pdf=&quot;/mnt/c/Program\ Files\ \(x86\)/Adobe/Acrobat\ DC/Acrobat/Acrobat.exe &amp;&quot;</span><br></pre></td></tr></table></figure>
+<figure>
+<img src="Fig2.png" alt="" /><figcaption>Fig2</figcaption>
+</figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Backup/" rel="tag"># Backup</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/06/02/Cooling-Curve-Processing/" rel="prev" title="冷却曲线处理">
+                  <i class="fa fa-angle-left"></i> 冷却曲线处理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/07/07/99/" rel="next" title="99">
+                  99 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Glenn L</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"ams","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
